@@ -10,6 +10,7 @@
     `git clone https://github.com/pynathanthomas/fourier_circles.git`
 
 2. Install dependencies
+
     `pip install -r ~/fourier_circles/requirements.txt`
 
 3. Find or create an image that has clear contours
