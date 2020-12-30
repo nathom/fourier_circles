@@ -20,6 +20,9 @@ BASE_FRAME = './resources/stanford/base.jpg'
 # creates new video in disk every time # of frames pass threshold
 MEMORY_THRESHOLD = 1200
 
+# defaults to saving videos here
+TEST_DIR = '/volumes/nathanbackup/fourier/vids'
+
 # thumbnail attributes
 THUMB_POS = (2800, 500)
 THUMB_SIZE_ORIG = (600, 600)
@@ -192,8 +195,12 @@ def get_zoom(t: int) -> None:
     if 0.4*t % 1 == 0:
         THUMB_SIZE_ORIG = (int(THUMB_SIZE_ORIG[0] - 0.4*t), int(THUMB_SIZE_ORIG[1] - 0.4*t))
 
-def save_frames(frames, test_dir='/volumes/nathanbackup/fourier/vids'):
+def save_frames(frames, test_dir=TEST_DIR):
+    if frames == []:
+        return
+
     global vid_no
+    global shape
 
     test_subdir = f'{test_dir}/test_{TEST_NO}'
     if not os.path.exists(test_subdir):
@@ -201,7 +208,7 @@ def save_frames(frames, test_dir='/volumes/nathanbackup/fourier/vids'):
 
     fourcc = cv2.VideoWriter_fourcc(*'avc1')
 
-    print(f'\n\nMaking video {vid_no + 1}/{FRAMES_PER_SHAPE * len(shape) // MEMORY_THRESHOLD + 1}...\n')
+    print(f'\n\nMaking video {vid_no + 1}/{max(FRAMES_PER_SHAPE * len(shape) // MEMORY_THRESHOLD, len(shape))}...\n')
     vid = cv2.VideoWriter(f'{test_subdir}/vid_{vid_no}.mp4', fourcc, 60, frames[0].size)
 
     for frame in tqdm(frames, unit='f'):
@@ -244,23 +251,20 @@ m = 1
 totals = []
 counter = 1
 
-i = 0
 shape = []
-for path in paths:
+for i, path in enumerate(paths):
     b = settings[i]['b']
     a = settings[i]['a']
     m = settings[i]['m']
     coords = [m*complex(d[0]*a, d[1]*b) for d in np.load(path)]
     shape.append(coords)
-    i += 1
 
 
 frame_number = 0
 gif_number = 0
 # counts which shape is currently being rendered
-i = 0
 frames = []
-for coords in shape:
+for i, coords in enumerate(shape):
     dft = np.fft.fft(coords)
     print(f'\n\nRendering frames for shape {i + 1}/{len(shape)}...\n')
     for t in tqdm(np.linspace(0, len(coords), FRAMES_PER_SHAPE), unit='f'):
@@ -275,17 +279,14 @@ for coords in shape:
 
         if frame_number > MEMORY_THRESHOLD:
             save_frames(frames)
-            frames = []
             gif_number += 1
             frame_number = 0
             print(f'\n\nRendering frames for shape {i + 1}/{len(shape) + 1}...\n')
 
         frame_number += 1
     save_frames(frames)
-    frames = []
     # for debugging
-    sys.exit()
+    #sys.exit('debugging session ended... exiting')
 
-    i += 1
 
 
