@@ -2,16 +2,19 @@ import subprocess
 import os
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 
-path = '/Volumes/nathanbackup/fourier/vids/test_10'
-files = [os.path.join(path, file) for file in os.listdir(path)]
-files.remove(os.path.join(path, '.DS_Store'))
-files.sort()
-print(files)
-output_file = os.path.join(path, 'output.mp4')
+def concat(dir, output_path='output.mp4'):
+    files = [os.path.join(dir, file) for file in os.listdir(dir)]
+    ds_store = os.path.join(dir, '.DS_Store')
+    if ds_store in files:
+        files.remove(ds_store)
 
-clips = []
-for file in files:
-    clips.append(VideoFileClip(file))
+    files.sort()
+    print(files)
+    output_file = os.path.join(dir, output_path)
 
-final = concatenate_videoclips(clips)
-final.write_videofile(output_file)
+    clips = map(VideoFileClip, files)
+
+    final = concatenate_videoclips(list(clips))
+    final.write_videofile(output_file)
+
+

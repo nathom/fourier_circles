@@ -18,7 +18,7 @@ BASE_FRAME = './resources/stanford/base.jpg'
 
 # number of frames to store in memory at a time
 # creates new video in disk every time # of frames pass threshold
-MEMORY_THRESHOLD = 1200
+MEMORY_THRESHOLD = 600
 
 # defaults to saving videos here
 TEST_DIR = '/volumes/nathanbackup/fourier/vids'
@@ -31,7 +31,7 @@ THUMB_CENTER = (THUMB_SIZE[0]//2 + THUMB_POS[0], THUMB_SIZE[1]//2 + THUMB_POS[1]
 THUMB_SCALE = (DIM[0]*DIM[1]) / (THUMB_SIZE_ORIG[0]*THUMB_SIZE_ORIG[1])
 MASK_DIM = (700, 500)
 
-TEST_NO = 11
+TEST_NO = 12
 
 # colors
 STANFORD_GREEN = (22, 103, 57)
@@ -40,8 +40,8 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 # globals
-endpoints = []
 vid_no = 0
+endpoints = []
 thumb_endpoints = []
 
 # calculated constants
@@ -181,6 +181,7 @@ def connect(shape, im):
         draw.polygon(new_coords, fill=(255, 0, 0))
         i += 1
 
+# fourier series coefficients
 def fourier(x, X):
     # n element of Z
     terms = []
@@ -209,7 +210,7 @@ def save_frames(frames, test_dir=TEST_DIR):
     fourcc = cv2.VideoWriter_fourcc(*'avc1')
 
     print(f'\n\nMaking video {vid_no + 1}/{max(FRAMES_PER_SHAPE * len(shape) // MEMORY_THRESHOLD, len(shape))}...\n')
-    vid = cv2.VideoWriter(f'{test_subdir}/vid_{vid_no}.mp4', fourcc, 60, frames[0].size)
+    vid = cv2.VideoWriter(f'{test_subdir}/vid_{vid_no:02d}.mp4', fourcc, 60, frames[0].size)
 
     for frame in tqdm(frames, unit='f'):
         cvim = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
@@ -261,7 +262,6 @@ for i, path in enumerate(paths):
 
 
 frame_number = 0
-gif_number = 0
 # counts which shape is currently being rendered
 frames = []
 for i, coords in enumerate(shape):
@@ -279,14 +279,17 @@ for i, coords in enumerate(shape):
 
         if frame_number > MEMORY_THRESHOLD:
             save_frames(frames)
-            gif_number += 1
+            frames = []
             frame_number = 0
             print(f'\n\nRendering frames for shape {i + 1}/{len(shape) + 1}...\n')
 
         frame_number += 1
     save_frames(frames)
+    frames = []
     # for debugging
     #sys.exit('debugging session ended... exiting')
 
+
+concat_vid.concat(f'{TEST_DIR}/test_{TEST_NO}')
 
 
