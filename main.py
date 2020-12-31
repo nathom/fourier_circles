@@ -31,7 +31,7 @@ THUMB_CENTER = (THUMB_SIZE[0]//2 + THUMB_POS[0], THUMB_SIZE[1]//2 + THUMB_POS[1]
 THUMB_SCALE = (DIM[0]*DIM[1]) / (THUMB_SIZE_ORIG[0]*THUMB_SIZE_ORIG[1])
 MASK_DIM = (700, 500)
 
-TEST_NO = 12
+TEST_NO = 13
 
 # colors
 STANFORD_GREEN = (22, 103, 57)
@@ -71,12 +71,6 @@ def render(dft, image, shift):
     zoomed_image = image.crop(ctuple(thumbnail_dim1) + ctuple(thumbnail_dim2))
     zoomed_image = zoomed_image.resize(THUMB_SIZE)
     image.paste(zoomed_image, THUMB_POS)
-
-    # tracing point
-    r = 5
-    acc = total_sum.conjugate() + complex(*shift)
-    r_c = r*(1 + 1j)
-    draw.arc([ctuple(acc - r_c), ctuple(acc + r_c)], 0, 360, width=r+1, fill=BLACK)
 
     # find max number of circles that fit in thumbnail
     acc = 0
@@ -128,6 +122,12 @@ def render(dft, image, shift):
     for num in dft:
         draw_circle(num, acc, draw, shift=shift)
         acc += num
+
+    # tracing point
+    r = 5
+    acc = total_sum.conjugate() + complex(*shift)
+    r_c = r*(1 + 1j)
+    draw.arc([ctuple(acc - r_c), ctuple(acc + r_c)], 0, 360, width=r+1, fill=BLACK)
 
 
 
