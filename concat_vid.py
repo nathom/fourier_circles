@@ -9,7 +9,6 @@ def concat(dir, output_path='output.mp4'):
         files.remove(ds_store)
 
     files.sort()
-    print(files)
     output_file = os.path.join(dir, output_path)
 
     clips = map(VideoFileClip, files)

@@ -6,13 +6,22 @@ import sys
 from tqdm import tqdm
 import cv2
 
+import concat_vid
+
+
+if len(sys.argv) > 3:
+    SECS_PER_SHAPE = int(sys.argv[1])
+    TEST_NO = int(sys.argv[2])
+    THUMB_SIZE_ORIG = (int(sys.argv[3]), int(sys.argv[3]))
+else:
+    SECS_PER_SHAPE = 200
+    TEST_NO = 13
+    THUMB_SIZE_ORIG = (600, 600)
+
 # dimensions of frame
 DIM = (3840, 2160)
 
 FPS = 60
-SECS_PER_SHAPE = 200
-FRAMES_PER_SHAPE = FPS * SECS_PER_SHAPE
-
 # everything is drawn on top of this
 BASE_FRAME = './resources/stanford/base.jpg'
 
@@ -23,15 +32,16 @@ MEMORY_THRESHOLD = 600
 # defaults to saving videos here
 TEST_DIR = '/volumes/nathanbackup/fourier/vids'
 
+FRAMES_PER_SHAPE = FPS * SECS_PER_SHAPE
+
+
 # thumbnail attributes
 THUMB_POS = (2800, 500)
-THUMB_SIZE_ORIG = (600, 600)
 THUMB_SIZE = (800, 800)
 THUMB_CENTER = (THUMB_SIZE[0]//2 + THUMB_POS[0], THUMB_SIZE[1]//2 + THUMB_POS[1])
 THUMB_SCALE = (DIM[0]*DIM[1]) / (THUMB_SIZE_ORIG[0]*THUMB_SIZE_ORIG[1])
 MASK_DIM = (700, 500)
 
-TEST_NO = 13
 
 # colors
 STANFORD_GREEN = (22, 103, 57)
@@ -46,6 +56,8 @@ thumb_endpoints = []
 
 # calculated constants
 thumb_dim_shift = complex(THUMB_SIZE_ORIG[0] // 2, THUMB_SIZE_ORIG[0] // 2)
+
+
 
 
 def render(dft, image, shift):
